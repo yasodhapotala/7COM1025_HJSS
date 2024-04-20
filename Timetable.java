@@ -1,14 +1,15 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 
 public class Timetable {
     private Map<String, Map<Integer, Map<String, Session>>> timetable;
-    private Map<Integer, Coach> coaches;
-    private Map<Integer, String> sessionDays = new HashMap<>();
+    public Map<Integer, Coach> coaches;
+    public Map<Integer, String> sessionDays = new HashMap<>();
     private final int LEARNERS = 4;
+    Scanner sc = new Scanner(System.in);
+    int sessionID = 1;
+    public Map<Integer, String> sessionTimingsAndId = new LinkedHashMap<>();
+    int id = 1;
 
     public Timetable() {
         timetable = new HashMap<>();
@@ -34,13 +35,28 @@ public class Timetable {
             for (int day = 1; day <= 4; day++) {
                 Map<String, Session> dayTimetable = new HashMap<>();
                 if (day == 4) {
-                    dayTimetable.put("2-3pm", new Session(coaches.get(1), 1, 0)); // Saturday sessions
-                    dayTimetable.put("3-4pm", new Session(coaches.get(2), 2, 0));
+                    dayTimetable.put("2-3pm", new Session(coaches.get(1), 1, 0,sessionID));
+                    sessionTimingsAndId.put(id, "2-3pm");
+                    id++;
+                    sessionID++;// Saturday sessions
+                    dayTimetable.put("3-4pm", new Session(coaches.get(2), 2, 0,sessionID));
+                    sessionTimingsAndId.put(id, "3-4pm");
+                    id++;
+                    sessionID++;
                 } else {
                     // Weekday sessions
-                    dayTimetable.put("4-5pm", new Session(coaches.get(4), 3, 0));
-                    dayTimetable.put("5-6pm", new Session(coaches.get(3), 4, 0));
-                    dayTimetable.put("6-7pm", new Session(coaches.get(1), 5, 0));
+                    dayTimetable.put("4-5pm", new Session(coaches.get(4), 3, 0,sessionID));
+                    sessionTimingsAndId.put(id, "4-5pm");
+                    id++;
+                    sessionID++;
+                    dayTimetable.put("5-6pm", new Session(coaches.get(3), 4, 0,sessionID));
+                    sessionTimingsAndId.put(id, "5-6pm");
+                    id++;
+                    sessionID++;
+                    dayTimetable.put("6-7pm", new Session(coaches.get(1), 5, 0,sessionID));
+                    sessionTimingsAndId.put(id, "6-7pm");
+                    id++;
+                    sessionID++;
                 }
                 weekTimetable.put(day, dayTimetable);
             }
@@ -54,7 +70,7 @@ public class Timetable {
         }
     }
 
-    public void viewTimetableByDay(int day, String weekNumber) {
+    public int viewTimetableByDay(int day, String weekNumber) {
         // Display the timetable for the specified day
         for (Map.Entry<String, Map<Integer, Map<String, Session>>> week : timetable.entrySet()) {
             if (week.getKey().equals("Week " + weekNumber)) {
@@ -64,45 +80,46 @@ public class Timetable {
                         System.out.println("Day: " + sessionDays.get(weekDay.getKey()));
                         for (Map.Entry<String, Session> session : weekDay.getValue().entrySet()) {
                             int vacancies = LEARNERS - session.getValue().getEnrolledLearners();
-                            System.out.println("Time: " + session.getKey() + ", Coach: " + session.getValue().getCoach().getName() + ", Grade: " + session.getValue().getGrade() + ", Vacancies: " + vacancies);
-                            System.out.println("_________________________________________________________");
+                            System.out.println("Session ID: "+session.getValue().getSessionID()+" Time: " + session.getKey() + ", Coach: " + session.getValue().getCoach().getName() + ", Grade: " + session.getValue().getGrade() + ", Vacancies: " + vacancies);
+                            System.out.println("_______________________________________________________________");
                         }
                     }
                 }
 
-
             }
         }
+        System.out.println("Enter Session ID: ");
+        int sessionId = sc.nextInt();
+        return sessionId;
     }
 
-    public void viewTimetableByGrade(int grade, String weekNumber) {
+    public int viewTimetableByGrade(int grade, String weekNumber) {
         // Display the timetable for the specified grade level
         for (Map.Entry<String, Map<Integer, Map<String, Session>>> week : timetable.entrySet()) {
             if (week.getKey().equals("Week " + weekNumber)) {
                 System.out.println("Week: " + week.getKey());
                 for (Map.Entry<Integer, Map<String, Session>> weekDay : week.getValue().entrySet()) {
-//                System.out.println("Day: " + sessionDays.get(weekDay.getKey()));
                     for (Map.Entry<String, Session> sessionEntry : weekDay.getValue().entrySet()) {
                         Session session = sessionEntry.getValue();
                         if (session.getGrade() == grade) {
                             System.out.println("Day: " + sessionDays.get(weekDay.getKey()));
                             int vacancies = LEARNERS - session.getEnrolledLearners(); // Calculate vacancies based on enrolled learners
-                            System.out.println("Time: " + sessionEntry.getKey() + ", Coach: " + session.getCoach().getName() +
+                            System.out.println("Session ID: "+session.getSessionID()+", Time: " + sessionEntry.getKey() + ", Coach: " + session.getCoach().getName() +
                                     ", Grade: " + session.getGrade() + ", Vacancies: " + vacancies);
-                            System.out.println("_________________________________________________________");
+                            System.out.println("_______________________________________________________________");
                         }
                     }
                 }
-
-
             }
-
         }
+        System.out.println("Enter Session ID: ");
+        int sessionId = sc.nextInt();
+        return sessionId;
     }
 
+    // Display the timetable for the specified coach
+    public int viewTimetableByCoach(String coachName, String weekNumber) {
 
-    public boolean viewTimetableByCoach(String coachName, String weekNumber) {
-        // Display the timetable for the specified coach
         boolean isInvalidCoach = true;
         for (Map.Entry<String, Map<Integer, Map<String, Session>>> week : timetable.entrySet()) {
             if (week.getKey().equals("Week " + weekNumber)) {
@@ -113,30 +130,84 @@ public class Timetable {
                         if (Objects.equals(session.getCoach().getName(), coachName)) {
                             System.out.println("Day: " + sessionDays.get(weekDay.getKey()));
                             int vacancies = LEARNERS - session.getEnrolledLearners(); // Calculate vacancies based on enrolled learners
-                            System.out.println("Time: " + sessionEntry.getKey() + ", Coach: " + session.getCoach().getName() +
+                            System.out.println("Session ID: "+session.getSessionID()+", Time: " + sessionEntry.getKey() + ", Coach: " + session.getCoach().getName() +
                                     ", Grade: " + session.getGrade() + ", Vacancies: " + vacancies);
+                            System.out.println("_______________________________________________________________");
                             isInvalidCoach = false;
-                            System.out.println("_________________________________________________________");
                         }
 
                     }
                 }
             }
         }
-        return isInvalidCoach;
+        if (!isInvalidCoach){
+            System.out.println("Enter Session ID: ");
+            int sessionId = sc.nextInt();
+            return sessionId;
+        }
+        return 0;
     }
 
+    //Book a session based on the availability
+    public Bookings bookSession(int learnerID, String learnerName, String weekNumber, int sessionID, int bookingID, String status, int grade){
+        for (Map.Entry<String, Map<Integer, Map<String, Session>>> week : timetable.entrySet()) {
+            if (week.getKey().equals("Week " + weekNumber)) {
+                System.out.println("Week: " + week.getKey());
+                for (Map.Entry<Integer, Map<String, Session>> weekDay : week.getValue().entrySet()) {
+                    for (Map.Entry<String, Session> sessionEntry : weekDay.getValue().entrySet()) {
+                        Session session = sessionEntry.getValue();
+                        if (session.getSessionID() == sessionID) {
+                            System.out.println("Day: " + sessionDays.get(weekDay.getKey()));
+                            int vacancies = LEARNERS - session.getEnrolledLearners(); // Calculate vacancies based on enrolled learners
+                            System.out.println("Session ID: "+session.getSessionID()+", Time: " + sessionEntry.getKey() + ", Coach: " + session.getCoach().getName() +
+                                    ", Grade: " + session.getGrade() + ", Vacancies: " + vacancies);
+                            System.out.println("Learner ID: "+ learnerID+" Learner Name: "+learnerName+" Booking ID: "+bookingID);
+                            System.out.println("_______________________________________________________________");
+                            if (vacancies > 0 && (session.getGrade() == grade || session.getGrade() == grade+1)){
+                                session.setEnrolledLearners(1);
+                                Bookings bookings = new Bookings(learnerID, learnerName, weekNumber, weekDay.getKey(), sessionID, bookingID, status, session.getGrade());
+                                return bookings;
+                            }
+                            else {
+                                System.out.println("Check vacancy and appropriate grade before booking!!");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void cancelSession(int sessionID, String weekNumber) {
+        for (Map.Entry<String, Map<Integer, Map<String, Session>>> week : timetable.entrySet()) {
+            if (week.getKey().equals("Week " + weekNumber)) {
+                System.out.println("Week: " + week.getKey());
+                for (Map.Entry<Integer, Map<String, Session>> weekDay : week.getValue().entrySet()) {
+                    for (Map.Entry<String, Session> sessionEntry : weekDay.getValue().entrySet()) {
+                        Session session = sessionEntry.getValue();
+                        if (session.getSessionID() == sessionID) {
+                            session.setEnrolledLearners(-1);
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("Booking Cancelled");
+    }
 }
 
 class Session {
     private Coach coach;
     private int grade;
     private int enrolledLearners;
+    private int sessionID;
 
-    public Session(Coach coach, int grade, int enrolledLearners) {
+    public Session(Coach coach, int grade, int enrolledLearners, int sessionID) {
         this.coach = coach;
         this.grade = grade;
         this.enrolledLearners = enrolledLearners;
+        this.sessionID = sessionID;
     }
 
     public Coach getCoach() {
@@ -150,5 +221,14 @@ class Session {
     public int getEnrolledLearners() {
         return enrolledLearners;
     }
+
+    public int getSessionID(){
+        return sessionID;
+    }
+
+    public void setEnrolledLearners(int newLearners){
+        enrolledLearners = enrolledLearners+ newLearners;
+    }
+
 
 }

@@ -6,11 +6,14 @@ public class Bookings {
     private int sessionID;
     private int bookingID;
     private String status;
+    private boolean booked;
+    private boolean cancel;
+    private boolean attended;
     private int grade;
 
 
 
-    public Bookings(int learnerID, String learnerName,String week, int day, int sessionID, int bookingID, String status, int grade){
+    public Bookings(int learnerID, String learnerName,String week, int day, int sessionID, int bookingID, String status, int grade, boolean isBooked, boolean isCancelled, boolean isAttended){
         this.learnerID = learnerID;
         this.learnerName = learnerName;
         this.week = week;
@@ -19,54 +22,28 @@ public class Bookings {
         this.bookingID = bookingID;
         this.status = status;
         this.grade = grade;
+        this.booked = isBooked;
+        this.attended = isAttended;
+        this.cancel = isCancelled;
     }
 
     public int getBookingID() {
         return bookingID;
     }
 
-    public void setBookingID(int bookingID) {
-        this.bookingID = bookingID;
-    }
-
     public int getSessionID() {
         return sessionID;
-    }
-
-    public void setSessionID(int sessionID) {
-        this.sessionID = sessionID;
     }
 
     public int getDay() {
         return day;
     }
-
-    public void setDay(int day) {
-        this.day = day;
-    }
-
     public String getWeek() {
         return week;
     }
 
-    public void setWeek(String week) {
-        this.week = week;
-    }
-
-    public String getLearnerName() {
-        return learnerName;
-    }
-
-    public void setLearnerName(String learnerName) {
-        this.learnerName = learnerName;
-    }
-
     public int getLearnerID() {
         return learnerID;
-    }
-
-    public void setLearnerID(int learnerID) {
-        this.learnerID = learnerID;
     }
 
     public int getGrade() {
@@ -79,5 +56,26 @@ public class Bookings {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isBooked() {
+        return booked;
+    }
+
+
+    public boolean isCancel() {
+        return cancel;
+    }
+
+    public void setCancel(boolean cancel) {
+        this.cancel = cancel;
+    }
+
+    public boolean isAttended() {
+        return attended;
+    }
+
+    public void setAttended(boolean attended) {
+        this.attended = attended;
     }
 }

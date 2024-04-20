@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -19,21 +18,23 @@ public class Main {
             System.out.println("1.Book Swimming Lesson");
             System.out.println("2.Change Swimming Lesson");
             System.out.println("3.Cancel Swimming Lesson");
-            System.out.println("4.Monthly Learners Report");
-            System.out.println("5.Monthly Coach Report");
-            System.out.println("6.Register New Learner");
-            System.out.println("7.Exit");
+            System.out.println("4.Attend Swimming Lesson");
+            System.out.println("5.Monthly Learners Report");
+            System.out.println("6.Monthly Coach Report");
+            System.out.println("7.Register New Learner");
+            System.out.println("8.Exit");
             System.out.print("Enter your option: ");
             choice = sc.nextInt();
             sc.nextLine();
 
             switch (choice) {
                 case 1: {
-                    actions.viewTimetable();
+
+                    actions.booking();
                     break;
                 }
                 case 2: {
-                    System.out.println("Session change successful");
+                    actions.changeBooking();
                     break;
                 }
                 case 3: {
@@ -41,14 +42,18 @@ public class Main {
                     break;
                 }
                 case 4: {
-                    actions.learnersReport();
+                    actions.attendSession();
                     break;
                 }
                 case 5: {
-                    System.out.println("coach report");
+                    actions.learnersReport();
                     break;
                 }
                 case 6: {
+                actions.coachReport();
+                 break;
+                }
+                case 7: {
                     boolean isRegisteredSuccessfully = actions.registerLearner();
                     if (isRegisteredSuccessfully){
                         System.out.println("_______________________________");
@@ -62,8 +67,7 @@ public class Main {
                     }
                     break;
                 }
-                case 7: {
-                    System.out.println("Exiting Program....");
+                case 8:{
                     isRunning = false;
                     break;
                 }

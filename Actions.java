@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
+//Class Action to perform all the specified functions
 public class Actions {
     Scanner sc = new Scanner(System.in);
     Timetable timetable = new Timetable();
@@ -12,6 +13,7 @@ public class Actions {
     public static int BOOKINGID = 1;
     private final String BOOKED = "booked";
     private final String CANCELLED = "cancelled";
+    private final String ATTENDED = "attended";
     private final int MINAGE = 4;
     private final int MAXAGE = 11;
     int choice;
@@ -53,12 +55,10 @@ public class Actions {
         return false;
     }
 
-    //Returns an Array list of the learners class
-    public ArrayList<Learner> getLearners() {
-        return learners;
-    }
-
-    public void viewTimetable() {
+    //New bookings and updates bookings arraylist
+    public boolean booking() {
+        System.out.println("\t\tBOOKING SESSION");
+        System.out.println("\t\t_______________");
         System.out.print("Enter Learner ID: ");
         int id = sc.nextInt();
         Learner obj = null;
@@ -94,7 +94,7 @@ public class Actions {
                                 int sessionID = timetable.viewTimetableByGrade(grade, weekNumber);
                                 boolean isAlreadyBooked = false;
                                 for(Bookings booking : bookings){
-                                    if (id == booking.getLearnerID() && sessionID == booking.getSessionID()){
+                                    if (id == booking.getLearnerID() && sessionID == booking.getSessionID() && Objects.equals(booking.getStatus(), BOOKED)){
                                         isAlreadyBooked = true;
                                         break;
                                     }
@@ -109,6 +109,8 @@ public class Actions {
                                         }
                                         bookings.add(booking);
                                         System.out.println("Booking Successful");
+                                        BOOKINGID++;
+                                        return true;
                                     }
                                     else {
                                         System.out.println("Error booking retry!!");
@@ -130,7 +132,7 @@ public class Actions {
                             System.out.println("1. Monday");
                             System.out.println("2. Wednesday");
                             System.out.println("3. Thursday");
-                            System.out.println("4. Friday");
+                            System.out.println("4. Saturday");
                             System.out.print("Enter Day To Check Availability(1,2,3,4): ");
                             int day = sc.nextInt();
                             if (day >= 1 && day <= 4) {
@@ -144,13 +146,9 @@ public class Actions {
                                 if(!isAlreadyBooked){
                                     Bookings booking = timetable.bookSession(obj.getLearnerId(), obj.getName(), weekNumber, sessionID, BOOKINGID, BOOKED, obj.getGrade());
                                     if (booking != null) {
-                                        for (Learner learner1 : learners) {
-                                            if (id == learner1.getLearnerId()) {
-                                                learner1.setGrade(booking.getGrade());
-                                            }
-                                        }
                                         bookings.add(booking);
                                         System.out.println("Booking Successful");
+                                        return true;
                                     }
                                     else {
                                         System.out.println("Error booking retry!!");
@@ -200,6 +198,7 @@ public class Actions {
                                         }
                                         bookings.add(booking);
                                         System.out.println("Booking Successful");
+                                        return true;
                                     }
                                     else {
                                         System.out.println("Error booking retry!!");
@@ -221,24 +220,20 @@ public class Actions {
         } else {
             System.out.println("Invalid Learner ID!!");
         }
-
+        return false;
     }
 
-    public void learnersReport() {
-        //Todo: create learners report
-//        for (Bookings booking: bookings){
-//            System.out.println("Learner Name; "+ booking.getLearnerName()+"Session ID: "+ booking.getSessionID()+" Status "+booking.getStatus());
-//        }
-    }
 
-    public void cancelBooking(){
+    //Updates the booking class
+    public boolean cancelBooking(){
+        System.out.println("\t\tCANCEL SESSION");
+        System.out.println("\t\t______________");
+
         System.out.print("Enter Learner ID: ");
         int id = sc.nextInt();
-        Learner obj = null;
         boolean isLearnerAvailable = false;
         for (Learner learner1 : learners) {
             if (id == learner1.getLearnerId()) {
-                obj = learner1;
                 isLearnerAvailable = true;
                 break;
             }
@@ -248,6 +243,7 @@ public class Actions {
             for (Bookings booking: bookings){
                 if (id == booking.getLearnerID()){
                     System.out.println("Booking ID: "+booking.getBookingID()+"\nSession ID: "+booking.getSessionID()+"\nSession Time: "+timetable.sessionTimingsAndId.get(booking.getSessionID())+"\nBooking Status: "+booking.getStatus());
+                    System.out.println("_________________________");
                     isBookingAvailable = true;
                 }
             }
@@ -257,7 +253,79 @@ public class Actions {
                 for (Bookings booking: bookings){
                     if (booking.getSessionID() == sessionID && Objects.equals(booking.getStatus(), BOOKED)){
                         booking.setStatus(CANCELLED);
+                        booking.setCancel(true);
                         timetable.cancelSession(sessionID, booking.getWeek());
+                        return true;
+                    }
+                }
+            }else {
+                System.out.println("No Bookings Available!!");
+            }
+        }
+        else {
+            System.out.println("Invalid Lerner ID");
+        }
+        return false;
+    }
+
+    //Change booking based on availability
+    public void changeBooking(){
+        System.out.println("SESSION CHANGE(cancel the existing session and will be redirected to new booking)");
+        System.out.println("_________________________________________________________________________________");
+        boolean isCancelled = cancelBooking();
+        if (isCancelled){
+            boolean isBooked = booking();
+            if (isBooked){
+                System.out.println("Successfully changed session.");
+                System.out.println("____________________________");
+
+            }
+        }
+    }
+
+    //Attend a session
+    public void attendSession(){
+        System.out.println("\t\tATTEND SESSION");
+        System.out.println("\t\t______________");
+
+        System.out.print("Enter Learner ID: ");
+        int id = sc.nextInt();
+        boolean isLearnerAvailable = false;
+        for (Learner learner1 : learners) {
+            if (id == learner1.getLearnerId()) {
+                isLearnerAvailable = true;
+                break;
+            }
+        }
+        if (isLearnerAvailable){
+            boolean isBookingAvailable = false;
+            for (Bookings booking: bookings){
+                if (id == booking.getLearnerID()){
+                    System.out.println("___________________________");
+                    System.out.println("Booking ID: "+booking.getBookingID()+"\nSession ID: "+booking.getSessionID()+"\nSession Time: "+timetable.sessionTimingsAndId.get(booking.getSessionID())+"\nBooking Status: "+booking.getStatus());
+                    System.out.println("___________________________");
+                    isBookingAvailable = true;
+                }
+            }
+            if (isBookingAvailable){
+                System.out.println("Enter Session ID to attend: ");
+                int sessionID = sc.nextInt();
+                for (Bookings booking: bookings){
+                    if (booking.getSessionID() == sessionID && Objects.equals(booking.getStatus(), BOOKED)){
+                        booking.setStatus(ATTENDED);
+                        booking.setAttended(true);
+                        System.out.println("Session attended Successfully!!");
+                        System.out.print("Write a small review: ");
+                        String review = sc.next();
+                        System.out.print("Rate the coach(1-5): ");
+                        int rating = sc.nextInt();
+                        timetable.addCoachRating(sessionID, review, rating, booking.getWeek());
+                        for (Learner learner1: learners){
+                            if (learner1.getLearnerId() == id && booking.getGrade() == learner1.getGrade()+1){
+                                learner1.setGrade(booking.getGrade());
+                                break;
+                            }
+                        }
                         break;
                     }
                 }
@@ -269,6 +337,10 @@ public class Actions {
             System.out.println("Invalid Lerner ID");
         }
     }
+
+
+
+    //To validate the learners age
     public boolean isValidAge(int age){
         if (age>= MINAGE && age <=MAXAGE){
             return true;
@@ -276,6 +348,7 @@ public class Actions {
         return false;
     }
 
+    //To validate the learners grade
     public boolean isValidGrade(int grade){
         if (grade >= 1 && grade <=5){
             return  true;
@@ -283,4 +356,46 @@ public class Actions {
         return false;
     }
 
+    //Display the overall monthly learners report
+    public void learnersReport() {
+        //Todo: create learners report
+
+        int count = 1;
+        System.out.println("\t\tLEARNER MONTHLY REPORT");
+        System.out.println("\t\t______________________");
+        for (Learner learner: learners){
+            int id = learner.getLearnerId();
+            String name = learner.getName();
+            int grade = learner.getGrade();
+            System.out.println(count+". "+name+"\nGrade: "+ grade);
+            int bookingCount = 0;
+            int cancelCount = 0;
+            int attendCount = 0;
+            for (Bookings booking : bookings){
+                if (id == booking.getLearnerID()){
+                    System.out.println("_________________________");
+                    System.out.println("Booking ID: "+ booking.getBookingID()+"\nWeek: "+booking.getWeek()+"\nDay: "+timetable.sessionDays.get(booking.getDay())+"\nSession Time: "+timetable.sessionTimingsAndId.get(booking.getSessionID())+"\nBooking Status: "+booking.getStatus());
+                    System.out.println("_________________________");
+                    if (booking.isCancel()){
+                        cancelCount++;
+                    }
+                    if (booking.isBooked()) {
+                        bookingCount++;
+                    }
+                    if (booking.isAttended()){
+                        attendCount++;
+                    }
+                }
+            }
+            System.out.println("Total Booked: "+ bookingCount);
+            System.out.println("Total Cancelled: "+ cancelCount);
+            System.out.println("Total Attended: "+ attendCount);
+            System.out.println("_________________________");
+        }
+
+    }
+    //Displays coach monthly report
+    public void coachReport() {
+        timetable.coachReport();
+    }
 }

@@ -7,6 +7,7 @@ public class Coach {
     ArrayList<Integer> rating = new ArrayList<>();
     private int averageRating;
     private Map<Integer, String> remarks = new HashMap<>();
+    ArrayList<String> review = new ArrayList<>();
 
 
     public Coach(String name) {
@@ -27,22 +28,22 @@ public class Coach {
         this.rating.add(rating);
     }
     //Calculates the average rating
-    public void getAverageRating(){
+    public int getAverageRating(){
         int sum = 0;
         int len = rating.size();
         for (int i =0; i< rating.size(); i++){
             sum+=rating.get(i);
         }
         averageRating = sum / len;
-
+        return averageRating;
+    }
+    public String  getRemarks(int averageRating){
+        return remarks.get(averageRating);
     }
 
-    public void coachReport(){
-        getAverageRating();
-        System.out.println("COACH REPORT");
-        System.out.println("____________");
-        System.out.println("Name: "+ name);
-        System.out.println("Rating: "+ averageRating);
-        System.out.println("Remarks: "+ remarks.get(averageRating));
+    public void setReview(String review){
+        this.review.add(review);
     }
+
+
 }
